@@ -6,6 +6,7 @@ parameters:
     paths:
         - src/
         - tests/
+    treatPhpDocTypesAsCertain: false
     ignoreErrors:
         -
             message: "#^Method .*::test.*\\(\\) has no return type specified\\.$#"
