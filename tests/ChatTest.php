@@ -62,7 +62,7 @@ final class ChatTest extends TestCase
         $result = $this->chat->submit($userMessage);
 
         $this->assertInstanceOf(AssistantMessage::class, $result);
-        $this->assertSame($assistantContent, $result->content);
+        $this->assertSame($assistantContent, $result->getContent());
         $this->assertCount(2, $this->store->load());
     }
 
@@ -87,7 +87,7 @@ final class ChatTest extends TestCase
         $result = $this->chat->submit($newUserMessage);
 
         $this->assertInstanceOf(AssistantMessage::class, $result);
-        $this->assertSame($newAssistantContent, $result->content);
+        $this->assertSame($newAssistantContent, $result->getContent());
         $this->assertCount(2, $this->store->load());
     }
 
@@ -110,7 +110,7 @@ final class ChatTest extends TestCase
         $result = $this->chat->submit($userMessage);
 
         $this->assertInstanceOf(AssistantMessage::class, $result);
-        $this->assertSame($assistantContent, $result->content);
+        $this->assertSame($assistantContent, $result->getContent());
         $this->assertCount(2, $this->store->load());
     }
 }
