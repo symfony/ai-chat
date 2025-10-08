@@ -72,8 +72,8 @@ final class InMemoryStoreTest extends TestCase
         $this->assertCount(1, $loadedMessages);
         $messages = $loadedMessages->getMessages();
         $this->assertInstanceOf(UserMessage::class, $messages[0]);
-        $this->assertInstanceOf(Text::class, $messages[0]->content[0]);
-        $this->assertSame('Test message', $messages[0]->content[0]->text);
+        $this->assertInstanceOf(Text::class, $messages[0]->getContent()[0]);
+        $this->assertSame('Test message', $messages[0]->getContent()[0]->getText());
     }
 
     public function testDropClearsMessages()
