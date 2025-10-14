@@ -12,22 +12,16 @@
 namespace Symfony\AI\Chat\Tests\Bridge\Meilisearch;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use Symfony\AI\Chat\Bridge\Meilisearch\MessageStore;
-use Symfony\AI\Platform\Message\AssistantMessage;
-use Symfony\AI\Platform\Message\Content\Text;
+use Symfony\AI\Chat\Tests\MessageStoreTestCase;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
-use Symfony\AI\Platform\Message\SystemMessage;
-use Symfony\AI\Platform\Message\ToolCallMessage;
-use Symfony\AI\Platform\Message\UserMessage;
 use Symfony\Component\Clock\MonotonicClock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
-use Symfony\Component\Uid\Uuid;
 
-final class MessageStoreTest extends TestCase
+final class MessageStoreTest extends MessageStoreTestCase
 {
     public function testStoreCannotSetupOnInvalidResponse()
     {
@@ -243,70 +237,5 @@ final class MessageStoreTest extends TestCase
 
         $this->assertCount(1, $messageBag);
         $this->assertSame(1, $httpClient->getRequestsCount());
-    }
-
-    public static function provideMessages(): \Generator
-    {
-        yield UserMessage::class => [
-            [
-                'id' => Uuid::v7()->toRfc4122(),
-                'type' => UserMessage::class,
-                'content' => '',
-                'contentAsBase64' => [
-                    [
-                        'type' => Text::class,
-                        'content' => 'What is the Symfony framework?',
-                    ],
-                ],
-                'toolsCalls' => [],
-                'metadata' => [],
-            ],
-        ];
-        yield SystemMessage::class => [
-            [
-                'id' => Uuid::v7()->toRfc4122(),
-                'type' => SystemMessage::class,
-                'content' => 'Hello there',
-                'contentAsBase64' => [],
-                'toolsCalls' => [],
-                'metadata' => [],
-            ],
-        ];
-        yield AssistantMessage::class => [
-            [
-                'id' => Uuid::v7()->toRfc4122(),
-                'type' => AssistantMessage::class,
-                'content' => 'Hello there',
-                'contentAsBase64' => [],
-                'toolsCalls' => [
-                    [
-                        'id' => '1',
-                        'name' => 'foo',
-                        'function' => [
-                            'name' => 'foo',
-                            'arguments' => '{}',
-                        ],
-                    ],
-                ],
-                'metadata' => [],
-            ],
-        ];
-        yield ToolCallMessage::class => [
-            [
-                'id' => Uuid::v7()->toRfc4122(),
-                'type' => ToolCallMessage::class,
-                'content' => 'Hello there',
-                'contentAsBase64' => [],
-                'toolsCalls' => [
-                    'id' => '1',
-                    'name' => 'foo',
-                    'function' => [
-                        'name' => 'foo',
-                        'arguments' => '{}',
-                    ],
-                ],
-                'metadata' => [],
-            ],
-        ];
     }
 }
