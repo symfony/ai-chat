@@ -9,3 +9,4 @@ CHANGELOG
    - Meilisearch
    - Pogocache
    - Redis
+   - SurrealDb
