@@ -37,14 +37,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Guillaume Loulier <personal@guillaumeloulier.fr>
  */
-final readonly class MessageStore implements ManagedStoreInterface, MessageStoreInterface
+final class MessageStore implements ManagedStoreInterface, MessageStoreInterface
 {
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private string $endpointUrl,
-        #[\SensitiveParameter] private string $apiKey,
-        private ClockInterface $clock,
-        private string $indexName = '_message_store_meilisearch',
+        private readonly HttpClientInterface $httpClient,
+        private readonly string $endpointUrl,
+        #[\SensitiveParameter] private readonly string $apiKey,
+        private readonly ClockInterface $clock,
+        private readonly string $indexName = '_message_store_meilisearch',
     ) {
         if (!interface_exists(ClockInterface::class)) {
             throw new RuntimeException('For using Meilisearch as a message store , symfony/clock is required. Try running "composer require symfony/clock".');

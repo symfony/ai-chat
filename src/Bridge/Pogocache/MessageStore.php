@@ -34,13 +34,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * @author Guillaume Loulier <personal@guillaumeloulier.fr>
  */
-final readonly class MessageStore implements ManagedStoreInterface, MessageStoreInterface
+final class MessageStore implements ManagedStoreInterface, MessageStoreInterface
 {
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private string $host,
-        #[\SensitiveParameter] private string $password,
-        private string $key = '_message_store_pogocache',
+        private readonly HttpClientInterface $httpClient,
+        private readonly string $host,
+        #[\SensitiveParameter] private readonly string $password,
+        private readonly string $key = '_message_store_pogocache',
     ) {
     }
 

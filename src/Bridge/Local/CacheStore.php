@@ -20,12 +20,12 @@ use Symfony\AI\Platform\Message\MessageBag;
 /**
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
-final readonly class CacheStore implements ManagedStoreInterface, MessageStoreInterface
+final class CacheStore implements ManagedStoreInterface, MessageStoreInterface
 {
     public function __construct(
-        private CacheItemPoolInterface $cache,
-        private string $cacheKey,
-        private int $ttl = 86400,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly string $cacheKey,
+        private readonly int $ttl = 86400,
     ) {
         if (!interface_exists(CacheItemPoolInterface::class)) {
             throw new RuntimeException('For using the CacheStore as message store, a PSR-6 cache implementation is required. Try running "composer require symfony/cache" or another PSR-6 compatible cache.');

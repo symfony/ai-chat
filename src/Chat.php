@@ -21,11 +21,11 @@ use Symfony\AI\Platform\Result\TextResult;
 /**
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
-final readonly class Chat implements ChatInterface
+final class Chat implements ChatInterface
 {
     public function __construct(
-        private AgentInterface $agent,
-        private MessageStoreInterface&ManagedStoreInterface $store,
+        private readonly AgentInterface $agent,
+        private readonly MessageStoreInterface&ManagedStoreInterface $store,
     ) {
     }
 
