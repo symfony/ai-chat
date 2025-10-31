@@ -27,6 +27,7 @@
     "require-dev": {
         "ext-redis": "*",
         "doctrine/dbal": "^3.3 || ^4.0",
+        "mongodb/mongodb": "^1.21 || ^2.0",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^11.5.13",
@@ -36,6 +37,9 @@
         "symfony/console": "^7.3|^8.0",
         "symfony/http-foundation": "^7.3|^8.0",
         "symfony/serializer": "^7.3|^8.0"
+    },
+    "conflict": {
+        "mongodb/mongodb": "<1.21"
     },
     "suggest": {
         "symfony/clock": "To use stores that requires waiting for actions like Meilisearch"
