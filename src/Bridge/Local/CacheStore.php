@@ -24,7 +24,7 @@ final class CacheStore implements ManagedStoreInterface, MessageStoreInterface
 {
     public function __construct(
         private readonly CacheItemPoolInterface $cache,
-        private readonly string $cacheKey,
+        private readonly string $cacheKey = '_message_store_cache',
         private readonly int $ttl = 86400,
     ) {
         if (!interface_exists(CacheItemPoolInterface::class)) {
