@@ -9,20 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\AI\Chat\Tests\Bridge\Local;
+namespace Symfony\AI\Chat\Tests\Bridge\Memory;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\AI\Chat\Bridge\Local\InMemoryStore;
+use Symfony\AI\Chat\Bridge\Memory\Store;
 use Symfony\AI\Platform\Message\Content\Text;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 use Symfony\AI\Platform\Message\UserMessage;
 
-final class InMemoryStoreTest extends TestCase
+final class StoreTest extends TestCase
 {
     public function testSetupInitializesEmptyMessageBag()
     {
-        $store = new InMemoryStore();
+        $store = new Store();
         $store->setup();
 
         $messages = $store->load();
@@ -33,7 +33,7 @@ final class InMemoryStoreTest extends TestCase
 
     public function testSaveStoresMessageBag()
     {
-        $store = new InMemoryStore();
+        $store = new Store();
 
         $messageBag = new MessageBag();
         $messageBag->add(Message::ofUser('Hello'));
@@ -49,7 +49,7 @@ final class InMemoryStoreTest extends TestCase
 
     public function testLoadReturnsEmptyMessageBagWhenNotInitialized()
     {
-        $store = new InMemoryStore();
+        $store = new Store();
 
         $messages = $store->load();
 
@@ -59,7 +59,7 @@ final class InMemoryStoreTest extends TestCase
 
     public function testLoadReturnsStoredMessages()
     {
-        $store = new InMemoryStore();
+        $store = new Store();
         $store->setup();
 
         $messageBag = new MessageBag();
@@ -78,7 +78,7 @@ final class InMemoryStoreTest extends TestCase
 
     public function testDropClearsMessages()
     {
-        $store = new InMemoryStore();
+        $store = new Store();
 
         $messageBag = new MessageBag();
         $messageBag->add(Message::ofUser('Message 1'));
@@ -95,7 +95,7 @@ final class InMemoryStoreTest extends TestCase
 
     public function testSetupOptions()
     {
-        $store = new InMemoryStore();
+        $store = new Store();
 
         $store->setup(['foo' => 'bar']);
 
