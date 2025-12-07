@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\AI\Chat\Tests\Bridge\Memory;
+namespace Symfony\AI\Chat\Tests\InMemory;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\AI\Chat\Bridge\Memory\Store;
+use Symfony\AI\Chat\InMemory\Store;
 use Symfony\AI\Platform\Message\Content\Text;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
