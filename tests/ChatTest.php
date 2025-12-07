@@ -14,7 +14,7 @@ namespace Symfony\AI\Chat\Tests;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\AI\Agent\AgentInterface;
-use Symfony\AI\Chat\Bridge\Local\InMemoryStore;
+use Symfony\AI\Chat\Bridge\Memory\Store as InMemoryStore;
 use Symfony\AI\Chat\Chat;
 use Symfony\AI\Platform\Message\AssistantMessage;
 use Symfony\AI\Platform\Message\Message;

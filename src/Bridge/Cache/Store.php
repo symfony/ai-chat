@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\AI\Chat\Bridge\Local;
+namespace Symfony\AI\Chat\Bridge\Cache;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\AI\Agent\Exception\RuntimeException;
@@ -20,7 +20,7 @@ use Symfony\AI\Platform\Message\MessageBag;
 /**
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
-final class CacheStore implements ManagedStoreInterface, MessageStoreInterface
+final class Store implements ManagedStoreInterface, MessageStoreInterface
 {
     public function __construct(
         private readonly CacheItemPoolInterface $cache,

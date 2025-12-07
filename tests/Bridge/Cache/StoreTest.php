@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\AI\Chat\Tests\Bridge\Local;
+namespace Symfony\AI\Chat\Tests\Bridge\Cache;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\AI\Chat\Bridge\Local\CacheStore;
+use Symfony\AI\Chat\Bridge\Cache\Store;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 
-final class CacheStoreTest extends TestCase
+final class StoreTest extends TestCase
 {
     public function testSetupStoresEmptyMessageBag()
     {
@@ -43,7 +43,7 @@ final class CacheStoreTest extends TestCase
             ->method('save')
             ->with($cacheItem);
 
-        $store = new CacheStore($cache, 'test_key');
+        $store = new Store($cache, 'test_key');
         $store->setup();
     }
 
@@ -64,7 +64,7 @@ final class CacheStoreTest extends TestCase
             ->method('save')
             ->with($cacheItem);
 
-        $store = new CacheStore($cache, 'test_key', 3600);
+        $store = new Store($cache, 'test_key', 3600);
         $store->setup();
     }
 
@@ -94,7 +94,7 @@ final class CacheStoreTest extends TestCase
             ->method('save')
             ->with($cacheItem);
 
-        $store = new CacheStore($cache, 'messages');
+        $store = new Store($cache, 'messages');
         $store->save($messageBag);
     }
 
@@ -119,7 +119,7 @@ final class CacheStoreTest extends TestCase
             ->method('get')
             ->willReturn($messageBag);
 
-        $store = new CacheStore($cache, 'test_key');
+        $store = new Store($cache, 'test_key');
         $result = $store->load();
 
         $this->assertSame($messageBag, $result);
@@ -143,7 +143,7 @@ final class CacheStoreTest extends TestCase
         $cacheItem->expects($this->never())
             ->method('get');
 
-        $store = new CacheStore($cache, 'test_key');
+        $store = new Store($cache, 'test_key');
         $result = $store->load();
 
         $this->assertInstanceOf(MessageBag::class, $result);
@@ -158,7 +158,7 @@ final class CacheStoreTest extends TestCase
             ->method('deleteItem')
             ->with('messages');
 
-        $store = new CacheStore($cache, 'messages');
+        $store = new Store($cache, 'messages');
         $store->drop();
     }
 }
