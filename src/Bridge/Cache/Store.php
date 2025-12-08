@@ -12,7 +12,7 @@
 namespace Symfony\AI\Chat\Bridge\Cache;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\AI\Agent\Exception\RuntimeException;
+use Symfony\AI\Chat\Exception\RuntimeException;
 use Symfony\AI\Chat\ManagedStoreInterface;
 use Symfony\AI\Chat\MessageStoreInterface;
 use Symfony\AI\Platform\Message\MessageBag;
