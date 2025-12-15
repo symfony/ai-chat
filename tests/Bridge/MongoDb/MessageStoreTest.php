@@ -89,7 +89,7 @@ final class MessageStoreTest extends TestCase
 
         $cursor = $this->createMock(CursorInterface::class);
         $cursor->expects($this->once())->method('toArray')->willReturn([
-            $serializer->normalize(Message::ofUser('Hello world')),
+            $serializer->normalize(Message::ofUser('Hello world'), context: ['identifier' => '_id']),
         ]);
 
         $collection = $this->createMock(Collection::class);

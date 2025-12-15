@@ -76,4 +76,19 @@ final class MessageNormalizerTest extends TestCase
         $this->assertSame(Role::User, $message->getRole());
         $this->assertArrayHasKey('addedAt', $message->getMetadata()->all());
     }
+
+    public function testItCanDenormalizeWithCustomIdentifier()
+    {
+        $normalizer = new MessageNormalizer();
+        $message = Message::ofUser('Hello World');
+
+        // Normalize with _id (like MongoDB)
+        $payload = $normalizer->normalize($message, context: ['identifier' => '_id']);
+        $this->assertArrayHasKey('_id', $payload);
+        $this->assertArrayNotHasKey('id', $payload);
+
+        $denormalized = $normalizer->denormalize($payload, MessageInterface::class, context: ['identifier' => '_id']);
+
+        $this->assertSame($message->getId()->toRfc4122(), $denormalized->getId()->toRfc4122());
+    }
 }

@@ -74,8 +74,9 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
             default => throw new LogicException(\sprintf('Unknown message type "%s".', $type)),
         };
 
+        $identifier = $context['identifier'] ?? 'id';
         /** @var AbstractUid&TimeBasedUidInterface&Uuid $existingUuid */
-        $existingUuid = Uuid::fromString($data['id']);
+        $existingUuid = Uuid::fromString($data[$identifier]);
 
         $messageWithExistingUuid = $message->withId($existingUuid);
 
