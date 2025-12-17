@@ -12,7 +12,6 @@
 namespace Symfony\AI\Chat\Bridge\Cache;
 
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\AI\Chat\Exception\RuntimeException;
 use Symfony\AI\Chat\ManagedStoreInterface;
 use Symfony\AI\Chat\MessageStoreInterface;
 use Symfony\AI\Platform\Message\MessageBag;
@@ -27,9 +26,6 @@ final class MessageStore implements ManagedStoreInterface, MessageStoreInterface
         private readonly string $cacheKey = '_message_store_cache',
         private readonly int $ttl = 86400,
     ) {
-        if (!interface_exists(CacheItemPoolInterface::class)) {
-            throw new RuntimeException('For using the CacheStore as message store, a PSR-6 cache implementation is required. Try running "composer require symfony/cache" or another PSR-6 compatible cache.');
-        }
     }
 
     public function setup(array $options = []): void
