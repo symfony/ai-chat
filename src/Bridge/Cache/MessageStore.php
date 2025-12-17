@@ -20,7 +20,7 @@ use Symfony\AI\Platform\Message\MessageBag;
 /**
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
-final class Store implements ManagedStoreInterface, MessageStoreInterface
+final class MessageStore implements ManagedStoreInterface, MessageStoreInterface
 {
     public function __construct(
         private readonly CacheItemPoolInterface $cache,
