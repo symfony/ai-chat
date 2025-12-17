@@ -41,9 +41,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:7700', 'test', new MonotonicClock(), 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes".');
+        $this->expectExceptionCode(400);
         $store->setup();
     }
 
@@ -110,9 +110,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:7700', 'test', new MonotonicClock(), 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes/test/documents".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes/test/documents".');
+        $this->expectExceptionCode(400);
         $store->drop();
     }
 
@@ -161,9 +161,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:7700', 'test', new MonotonicClock(), 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes/test/documents".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes/test/documents".');
+        $this->expectExceptionCode(400);
         $store->save(new MessageBag(Message::ofUser('Hello there')));
     }
 
@@ -212,9 +212,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:7700', 'test', new MonotonicClock(), 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes/test/documents/fetch".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:7700/indexes/test/documents/fetch".');
+        $this->expectExceptionCode(400);
         $store->load();
     }
 
