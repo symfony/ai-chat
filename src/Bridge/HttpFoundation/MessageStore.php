@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * @author Christopher Hertel <mail@christopher-hertel.de>
  */
-final class SessionStore implements ManagedStoreInterface, MessageStoreInterface
+final class MessageStore implements ManagedStoreInterface, MessageStoreInterface
 {
     private readonly SessionInterface $session;
 
@@ -30,7 +30,7 @@ final class SessionStore implements ManagedStoreInterface, MessageStoreInterface
         private readonly string $sessionKey = 'messages',
     ) {
         if (!class_exists(RequestStack::class)) {
-            throw new RuntimeException('For using the SessionStore as message store, the symfony/http-foundation package is required. Try running "composer require symfony/http-foundation".');
+            throw new RuntimeException('For using the MessageStore as message store, the symfony/http-foundation package is required. Try running "composer require symfony/http-foundation".');
         }
 
         $this->session = $requestStack->getSession();
