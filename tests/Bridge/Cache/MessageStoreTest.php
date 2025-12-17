@@ -14,11 +14,11 @@ namespace Symfony\AI\Chat\Tests\Bridge\Cache;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\AI\Chat\Bridge\Cache\Store;
+use Symfony\AI\Chat\Bridge\Cache\MessageStore;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 
-final class StoreTest extends TestCase
+final class MessageStoreTest extends TestCase
 {
     public function testSetupStoresEmptyMessageBag()
     {
@@ -43,7 +43,7 @@ final class StoreTest extends TestCase
             ->method('save')
             ->with($cacheItem);
 
-        $store = new Store($cache, 'test_key');
+        $store = new MessageStore($cache, 'test_key');
         $store->setup();
     }
 
@@ -64,7 +64,7 @@ final class StoreTest extends TestCase
             ->method('save')
             ->with($cacheItem);
 
-        $store = new Store($cache, 'test_key', 3600);
+        $store = new MessageStore($cache, 'test_key', 3600);
         $store->setup();
     }
 
@@ -94,7 +94,7 @@ final class StoreTest extends TestCase
             ->method('save')
             ->with($cacheItem);
 
-        $store = new Store($cache, 'messages');
+        $store = new MessageStore($cache, 'messages');
         $store->save($messageBag);
     }
 
@@ -119,7 +119,7 @@ final class StoreTest extends TestCase
             ->method('get')
             ->willReturn($messageBag);
 
-        $store = new Store($cache, 'test_key');
+        $store = new MessageStore($cache, 'test_key');
         $result = $store->load();
 
         $this->assertSame($messageBag, $result);
@@ -143,7 +143,7 @@ final class StoreTest extends TestCase
         $cacheItem->expects($this->never())
             ->method('get');
 
-        $store = new Store($cache, 'test_key');
+        $store = new MessageStore($cache, 'test_key');
         $result = $store->load();
 
         $this->assertInstanceOf(MessageBag::class, $result);
@@ -158,7 +158,7 @@ final class StoreTest extends TestCase
             ->method('deleteItem')
             ->with('messages');
 
-        $store = new Store($cache, 'messages');
+        $store = new MessageStore($cache, 'messages');
         $store->drop();
     }
 }
