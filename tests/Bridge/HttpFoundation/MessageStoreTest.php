@@ -12,13 +12,13 @@
 namespace Symfony\AI\Chat\Tests\Bridge\HttpFoundation;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\AI\Chat\Bridge\HttpFoundation\SessionStore;
+use Symfony\AI\Chat\Bridge\HttpFoundation\MessageStore;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class SessionStoreTest extends TestCase
+final class MessageStoreTest extends TestCase
 {
     public function testSetupStoresEmptyMessageBag()
     {
@@ -33,7 +33,7 @@ final class SessionStoreTest extends TestCase
             ->method('set')
             ->with('messages', $this->isInstanceOf(MessageBag::class));
 
-        $store = new SessionStore($requestStack, 'messages');
+        $store = new MessageStore($requestStack, 'messages');
         $store->setup();
     }
 
@@ -50,7 +50,7 @@ final class SessionStoreTest extends TestCase
             ->method('set')
             ->with('custom_key', $this->isInstanceOf(MessageBag::class));
 
-        $store = new SessionStore($requestStack, 'custom_key');
+        $store = new MessageStore($requestStack, 'custom_key');
         $store->setup();
     }
 
@@ -70,7 +70,7 @@ final class SessionStoreTest extends TestCase
             ->method('set')
             ->with('messages', $messageBag);
 
-        $store = new SessionStore($requestStack, 'messages');
+        $store = new MessageStore($requestStack, 'messages');
         $store->save($messageBag);
     }
 
@@ -91,7 +91,7 @@ final class SessionStoreTest extends TestCase
             ->with('messages', $this->isInstanceOf(MessageBag::class))
             ->willReturn($messageBag);
 
-        $store = new SessionStore($requestStack, 'messages');
+        $store = new MessageStore($requestStack, 'messages');
         $result = $store->load();
 
         $this->assertSame($messageBag, $result);
@@ -112,7 +112,7 @@ final class SessionStoreTest extends TestCase
             ->with('messages', $this->isInstanceOf(MessageBag::class))
             ->willReturn(new MessageBag());
 
-        $store = new SessionStore($requestStack, 'messages');
+        $store = new MessageStore($requestStack, 'messages');
         $result = $store->load();
 
         $this->assertInstanceOf(MessageBag::class, $result);
@@ -132,7 +132,7 @@ final class SessionStoreTest extends TestCase
             ->method('remove')
             ->with('messages');
 
-        $store = new SessionStore($requestStack, 'messages');
+        $store = new MessageStore($requestStack, 'messages');
         $store->drop();
     }
 }
