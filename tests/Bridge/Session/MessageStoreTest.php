@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\AI\Chat\Tests\Bridge\HttpFoundation;
+namespace Symfony\AI\Chat\Tests\Bridge\Session;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\AI\Chat\Bridge\HttpFoundation\MessageStore;
+use Symfony\AI\Chat\Bridge\Session\MessageStore;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 use Symfony\Component\HttpFoundation\RequestStack;
