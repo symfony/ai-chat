@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\AI\Chat\Bridge\HttpFoundation;
+namespace Symfony\AI\Chat\Bridge\Session;
 
 use Symfony\AI\Chat\Exception\RuntimeException;
 use Symfony\AI\Chat\ManagedStoreInterface;
