@@ -36,9 +36,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:9401', 'test', 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:9401/test?auth=test".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:9401/test?auth=test".');
+        $this->expectExceptionCode(400);
         $store->setup();
     }
 
@@ -67,9 +67,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:9401', 'test', 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 404 returned for "http://127.0.0.1:9401/test?auth=test".');
-        self::expectExceptionCode(404);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 404 returned for "http://127.0.0.1:9401/test?auth=test".');
+        $this->expectExceptionCode(404);
         $store->drop();
     }
 
@@ -98,9 +98,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:9401', 'test', 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:9401/test?auth=test".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:9401/test?auth=test".');
+        $this->expectExceptionCode(400);
         $store->save(new MessageBag(Message::ofUser('Hello there')));
     }
 
@@ -129,9 +129,9 @@ final class MessageStoreTest extends TestCase
 
         $store = new MessageStore($httpClient, 'http://127.0.0.1:9401', 'test', 'test');
 
-        self::expectException(ClientException::class);
-        self::expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:9401/test?auth=test".');
-        self::expectExceptionCode(400);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('HTTP 400 returned for "http://127.0.0.1:9401/test?auth=test".');
+        $this->expectExceptionCode(400);
         $store->load();
     }
 
