@@ -56,26 +56,14 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
         $message = match ($type) {
             SystemMessage::class => new SystemMessage($content),
             AssistantMessage::class => new AssistantMessage(...self::denormalizeAssistantParts($data)),
-            UserMessage::class => new UserMessage(...array_map(
-                static fn (array $part): ContentInterface => match ($part['type']) {
-                    File::class,
-                    Document::class,
-                    Image::class,
-                    Audio::class => $part['type']::fromDataUrl($part['content']),
-                    Text::class => new Text($part['content']),
-                    ImageUrl::class => new ImageUrl($part['content']),
-                    DocumentUrl::class => new DocumentUrl($part['content']),
-                    default => throw new LogicException(\sprintf('Unknown content type "%s".', $part['type'])),
-                },
-                $contentAsBase64,
-            )),
+            UserMessage::class => new UserMessage(...self::denormalizeContentParts($contentAsBase64)),
             ToolCallMessage::class => new ToolCallMessage(
                 new ToolCall(
                     $data['toolsCalls']['id'],
                     $data['toolsCalls']['function']['name'],
                     json_decode($data['toolsCalls']['function']['arguments'], true)
                 ),
-                $content
+                ...([] !== $contentAsBase64 ? self::denormalizeContentParts($contentAsBase64) : [new Text($content)]),
             ),
             default => throw new LogicException(\sprintf('Unknown message type "%s".', $type)),
         };
@@ -121,7 +109,7 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
         } elseif ($data instanceof SystemMessage) {
             $content = $data->getContent();
         } elseif ($data instanceof ToolCallMessage) {
-            $content = $data->getContent();
+            $content = $data->asText() ?? '';
             $toolsCalls = $this->normalizer->normalize($data->getToolCall(), $format, $context);
         }
 
@@ -129,22 +117,7 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
             $context['identifier'] ?? 'id' => $data->getId()->toRfc4122(),
             'type' => $data::class,
             'content' => $content,
-            'contentAsBase64' => ($data instanceof UserMessage && [] !== $data->getContent()) ? array_map(
-                static fn (ContentInterface $content) => [
-                    'type' => $content::class,
-                    'content' => match ($content::class) {
-                        Text::class => $content->getText(),
-                        File::class,
-                        Document::class,
-                        Image::class,
-                        Audio::class => $content->asBase64(),
-                        ImageUrl::class,
-                        DocumentUrl::class => $content->getUrl(),
-                        default => throw new LogicException(\sprintf('Unknown content type "%s".', $content::class)),
-                    },
-                ],
-                $data->getContent(),
-            ) : [],
+            'contentAsBase64' => ($data instanceof UserMessage || $data instanceof ToolCallMessage) && [] !== $data->getContent() ? self::normalizeContentParts($data->getContent()) : [],
             'toolsCalls' => $toolsCalls,
             'parts' => $parts,
             'metadata' => $data->getMetadata()->all(),
@@ -183,6 +156,53 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
         }
 
         return $parts;
+    }
+
+    /**
+     * @param ContentInterface[] $contents
+     *
+     * @return list<array{type: class-string, content: string}>
+     */
+    private static function normalizeContentParts(array $contents): array
+    {
+        return array_map(
+            static fn (ContentInterface $content) => [
+                'type' => $content::class,
+                'content' => match ($content::class) {
+                    Text::class => $content->getText(),
+                    File::class,
+                    Document::class,
+                    Image::class,
+                    Audio::class => $content->asDataUrl(),
+                    ImageUrl::class,
+                    DocumentUrl::class => $content->getUrl(),
+                    default => throw new LogicException(\sprintf('Unknown content type "%s".', $content::class)),
+                },
+            ],
+            $contents,
+        );
+    }
+
+    /**
+     * @param array<array{type: class-string, content: string}> $parts
+     *
+     * @return list<ContentInterface>
+     */
+    private static function denormalizeContentParts(array $parts): array
+    {
+        return array_map(
+            static fn (array $part): ContentInterface => match ($part['type']) {
+                File::class,
+                Document::class,
+                Image::class,
+                Audio::class => $part['type']::fromDataUrl($part['content']),
+                Text::class => new Text($part['content']),
+                ImageUrl::class => new ImageUrl($part['content']),
+                DocumentUrl::class => new DocumentUrl($part['content']),
+                default => throw new LogicException(\sprintf('Unknown content type "%s".', $part['type'])),
+            },
+            $parts,
+        );
     }
 
     /**

@@ -17,6 +17,7 @@ use Symfony\AI\Chat\MessageNormalizer;
 use Symfony\AI\Platform\Contract\Normalizer\Result\ToolCallNormalizer;
 use Symfony\AI\Platform\Message\AssistantMessage;
 use Symfony\AI\Platform\Message\Content\DocumentUrl;
+use Symfony\AI\Platform\Message\Content\Image;
 use Symfony\AI\Platform\Message\Content\ImageUrl;
 use Symfony\AI\Platform\Message\Content\Text;
 use Symfony\AI\Platform\Message\Content\Thinking;
@@ -262,7 +263,7 @@ final class MessageNormalizerTest extends TestCase
 
         $message = new ToolCallMessage(
             new ToolCall('call-1', 'get_weather', ['city' => 'Paris']),
-            'Sunny, 22°C',
+            new Text('Sunny, 22°C'),
         );
 
         $payload = $serializer->normalize($message);
@@ -274,9 +275,43 @@ final class MessageNormalizerTest extends TestCase
         $denormalized = $serializer->denormalize($payload, MessageInterface::class);
 
         $this->assertInstanceOf(ToolCallMessage::class, $denormalized);
-        $this->assertSame('Sunny, 22°C', $denormalized->getContent());
+        $this->assertSame('Sunny, 22°C', $denormalized->asText());
         $this->assertSame('call-1', $denormalized->getToolCall()->getId());
         $this->assertSame('get_weather', $denormalized->getToolCall()->getName());
         $this->assertSame(['city' => 'Paris'], $denormalized->getToolCall()->getArguments());
+    }
+
+    public function testItCanNormalizeAndDenormalizeMultimodalToolCallMessage()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ToolCallNormalizer(),
+            new MessageNormalizer(),
+        ], [new JsonEncoder()]);
+
+        $message = new ToolCallMessage(
+            new ToolCall('call-1', 'screenshot', []),
+            new Text('Here is the screenshot'),
+            new Image('binary', 'image/png'),
+        );
+
+        $payload = $serializer->normalize($message);
+
+        $this->assertSame('Here is the screenshot', $payload['content']);
+        $this->assertSame([
+            ['type' => Text::class, 'content' => 'Here is the screenshot'],
+            ['type' => Image::class, 'content' => 'data:image/png;base64,'.base64_encode('binary')],
+        ], $payload['contentAsBase64']);
+
+        $denormalized = $serializer->denormalize($payload, MessageInterface::class);
+
+        $this->assertInstanceOf(ToolCallMessage::class, $denormalized);
+        $parts = $denormalized->getContent();
+        $this->assertCount(2, $parts);
+        $this->assertInstanceOf(Text::class, $parts[0]);
+        $this->assertSame('Here is the screenshot', $parts[0]->getText());
+        $this->assertInstanceOf(Image::class, $parts[1]);
+        $this->assertSame('binary', $parts[1]->asBinary());
+        $this->assertSame('image/png', $parts[1]->getFormat());
     }
 }
