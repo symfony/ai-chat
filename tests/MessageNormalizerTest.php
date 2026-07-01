@@ -21,6 +21,7 @@ use Symfony\AI\Platform\Message\Content\Image;
 use Symfony\AI\Platform\Message\Content\ImageUrl;
 use Symfony\AI\Platform\Message\Content\Text;
 use Symfony\AI\Platform\Message\Content\Thinking;
+use Symfony\AI\Platform\Message\Content\WebSearch;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageInterface;
 use Symfony\AI\Platform\Message\Role;
@@ -217,6 +218,28 @@ final class MessageNormalizerTest extends TestCase
         $this->assertSame([], $toolCalls[1]->getArguments());
     }
 
+    public function testItCanNormalizeAndDenormalizeAssistantMessageWithImage()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ToolCallNormalizer(),
+            new MessageNormalizer(),
+        ], [new JsonEncoder()]);
+
+        $dataUrl = 'data:image/png;base64,SGVsbG8=';
+        $message = new AssistantMessage(Image::fromDataUrl($dataUrl));
+
+        $payload = $serializer->normalize($message);
+        $denormalized = $serializer->denormalize($payload, MessageInterface::class);
+
+        $this->assertInstanceOf(AssistantMessage::class, $denormalized);
+
+        $content = $denormalized->getContent();
+        $this->assertCount(1, $content);
+        $this->assertInstanceOf(Image::class, $content[0]);
+        $this->assertSame($dataUrl, $content[0]->asDataUrl());
+    }
+
     public function testItPreservesAssistantPartOrderingAcrossRoundtrip()
     {
         $serializer = new Serializer([
@@ -251,6 +274,67 @@ final class MessageNormalizerTest extends TestCase
         $this->assertSame('sig_2', $parts[3]->getSignature());
         $this->assertInstanceOf(Text::class, $parts[4]);
         $this->assertSame('Trailing text.', $parts[4]->getText());
+    }
+
+    public function testItPreservesMixedTextImageAndToolCallOrderingAcrossRoundtrip()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ToolCallNormalizer(),
+            new MessageNormalizer(),
+        ], [new JsonEncoder()]);
+
+        $dataUrl = 'data:image/png;base64,SGVsbG8=';
+        $message = new AssistantMessage(
+            new Text('Here is the chart you asked for:'),
+            Image::fromDataUrl($dataUrl),
+            new ToolCall('call-1', 'save_report', ['name' => 'chart.png']),
+            new ImageUrl('https://example.com/preview.png'),
+            new Text('Saved.'),
+        );
+
+        $payload = $serializer->normalize($message);
+        /** @var AssistantMessage $denormalized */
+        $denormalized = $serializer->denormalize($payload, MessageInterface::class);
+
+        $parts = $denormalized->getContent();
+        $this->assertCount(5, $parts);
+        $this->assertInstanceOf(Text::class, $parts[0]);
+        $this->assertSame('Here is the chart you asked for:', $parts[0]->getText());
+        $this->assertInstanceOf(Image::class, $parts[1]);
+        $this->assertSame($dataUrl, $parts[1]->asDataUrl());
+        $this->assertInstanceOf(ToolCall::class, $parts[2]);
+        $this->assertSame('call-1', $parts[2]->getId());
+        $this->assertInstanceOf(ImageUrl::class, $parts[3]);
+        $this->assertSame('https://example.com/preview.png', $parts[3]->getUrl());
+        $this->assertInstanceOf(Text::class, $parts[4]);
+        $this->assertSame('Saved.', $parts[4]->getText());
+    }
+
+    public function testItSkipsUnknownAssistantContentTypes()
+    {
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ToolCallNormalizer(),
+            new MessageNormalizer(),
+        ], [new JsonEncoder()]);
+
+        $message = new AssistantMessage(
+            new Text('Let me look that up.'),
+            new WebSearch(query: 'symfony ai'),
+            new Text('Found it.'),
+        );
+
+        $payload = $serializer->normalize($message);
+        /** @var AssistantMessage $denormalized */
+        $denormalized = $serializer->denormalize($payload, MessageInterface::class);
+
+        $parts = $denormalized->getContent();
+        $this->assertCount(2, $parts);
+        $this->assertInstanceOf(Text::class, $parts[0]);
+        $this->assertSame('Let me look that up.', $parts[0]->getText());
+        $this->assertInstanceOf(Text::class, $parts[1]);
+        $this->assertSame('Found it.', $parts[1]->getText());
     }
 
     public function testItCanNormalizeAndDenormalizeToolCallMessage()

@@ -22,6 +22,7 @@ use Symfony\AI\Platform\Message\Content\Image;
 use Symfony\AI\Platform\Message\Content\ImageUrl;
 use Symfony\AI\Platform\Message\Content\Text;
 use Symfony\AI\Platform\Message\Content\Thinking;
+use Symfony\AI\Platform\Message\Content\Video;
 use Symfony\AI\Platform\Message\MessageInterface;
 use Symfony\AI\Platform\Message\SystemMessage;
 use Symfony\AI\Platform\Message\ToolCallMessage;
@@ -152,6 +153,8 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
                 $parts[] = ['type' => Thinking::class, 'content' => $part->getContent(), 'signature' => $part->getSignature()];
             } elseif ($part instanceof ToolCall) {
                 $parts[] = ['type' => ToolCall::class, 'toolCall' => $this->normalizer->normalize($part, $format, $context)];
+            } elseif ($part instanceof File || $part instanceof ImageUrl || $part instanceof DocumentUrl) {
+                $parts[] = self::normalizeContentParts([$part])[0];
             }
         }
 
@@ -173,7 +176,8 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
                     File::class,
                     Document::class,
                     Image::class,
-                    Audio::class => $content->asDataUrl(),
+                    Audio::class,
+                    Video::class => $content->asDataUrl(),
                     ImageUrl::class,
                     DocumentUrl::class => $content->getUrl(),
                     default => throw new LogicException(\sprintf('Unknown content type "%s".', $content::class)),
@@ -195,7 +199,8 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
                 File::class,
                 Document::class,
                 Image::class,
-                Audio::class => $part['type']::fromDataUrl($part['content']),
+                Audio::class,
+                Video::class => $part['type']::fromDataUrl($part['content']),
                 Text::class => new Text($part['content']),
                 ImageUrl::class => new ImageUrl($part['content']),
                 DocumentUrl::class => new DocumentUrl($part['content']),
@@ -223,7 +228,7 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
                         $part['toolCall']['function']['name'],
                         json_decode($part['toolCall']['function']['arguments'], true),
                     ),
-                    default => throw new LogicException(\sprintf('Unknown assistant part type "%s".', $part['type'])),
+                    default => self::denormalizeContentParts([$part])[0],
                 };
             }
 
