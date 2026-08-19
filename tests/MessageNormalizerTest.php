@@ -115,7 +115,7 @@ final class MessageNormalizerTest extends TestCase
         $normalizer = new MessageNormalizer();
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(\sprintf('Unknown content type "%s".', \stdClass::class));
+        $this->expectExceptionMessage(\sprintf('Unknown user message content type "%s".', \stdClass::class));
 
         $normalizer->denormalize([
             'id' => Uuid::v7()->toRfc4122(),
@@ -128,6 +128,56 @@ final class MessageNormalizerTest extends TestCase
                 ],
             ],
             'toolsCalls' => [],
+            'metadata' => [],
+            'addedAt' => (new \DateTimeImmutable())->getTimestamp(),
+        ], MessageInterface::class);
+    }
+
+    public function testItRejectsUnknownToolCallMessageContentType()
+    {
+        $normalizer = new MessageNormalizer();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Unknown tool call content type "%s".', \stdClass::class));
+
+        $normalizer->denormalize([
+            'id' => Uuid::v7()->toRfc4122(),
+            'type' => ToolCallMessage::class,
+            'content' => '',
+            'contentAsBase64' => [
+                [
+                    'type' => \stdClass::class,
+                    'content' => 'arbitrary-constructor-argument',
+                ],
+            ],
+            'toolsCalls' => [
+                'id' => 'call-1',
+                'function' => ['name' => 'screenshot', 'arguments' => '[]'],
+            ],
+            'metadata' => [],
+            'addedAt' => (new \DateTimeImmutable())->getTimestamp(),
+        ], MessageInterface::class);
+    }
+
+    public function testItRejectsUnknownAssistantPartType()
+    {
+        $normalizer = new MessageNormalizer();
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Unknown assistant part type "%s".', \stdClass::class));
+
+        $normalizer->denormalize([
+            'id' => Uuid::v7()->toRfc4122(),
+            'type' => AssistantMessage::class,
+            'content' => '',
+            'contentAsBase64' => [],
+            'toolsCalls' => [],
+            'parts' => [
+                [
+                    'type' => \stdClass::class,
+                    'content' => 'arbitrary-constructor-argument',
+                ],
+            ],
             'metadata' => [],
             'addedAt' => (new \DateTimeImmutable())->getTimestamp(),
         ], MessageInterface::class);

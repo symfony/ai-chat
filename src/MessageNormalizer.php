@@ -57,14 +57,14 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
         $message = match ($type) {
             SystemMessage::class => new SystemMessage($content),
             AssistantMessage::class => new AssistantMessage(...self::denormalizeAssistantParts($data)),
-            UserMessage::class => new UserMessage(...self::denormalizeContentParts($contentAsBase64)),
+            UserMessage::class => new UserMessage(...self::denormalizeContentParts($contentAsBase64, 'user message content type')),
             ToolCallMessage::class => new ToolCallMessage(
                 new ToolCall(
                     $data['toolsCalls']['id'],
                     $data['toolsCalls']['function']['name'],
                     json_decode($data['toolsCalls']['function']['arguments'], true)
                 ),
-                ...([] !== $contentAsBase64 ? self::denormalizeContentParts($contentAsBase64) : [new Text($content)]),
+                ...([] !== $contentAsBase64 ? self::denormalizeContentParts($contentAsBase64, 'tool call content type') : [new Text($content)]),
             ),
             default => throw new LogicException(\sprintf('Unknown message type "%s".', $type)),
         };
@@ -192,7 +192,7 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
      *
      * @return list<ContentInterface>
      */
-    private static function denormalizeContentParts(array $parts): array
+    private static function denormalizeContentParts(array $parts, string $subject): array
     {
         return array_map(
             static fn (array $part): ContentInterface => match ($part['type']) {
@@ -204,7 +204,7 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
                 Text::class => new Text($part['content']),
                 ImageUrl::class => new ImageUrl($part['content']),
                 DocumentUrl::class => new DocumentUrl($part['content']),
-                default => throw new LogicException(\sprintf('Unknown content type "%s".', $part['type'])),
+                default => throw new LogicException(\sprintf('Unknown %s "%s".', $subject, $part['type'])),
             },
             $parts,
         );
@@ -228,7 +228,7 @@ final class MessageNormalizer implements NormalizerInterface, DenormalizerInterf
                         $part['toolCall']['function']['name'],
                         json_decode($part['toolCall']['function']['arguments'], true),
                     ),
-                    default => self::denormalizeContentParts([$part])[0],
+                    default => self::denormalizeContentParts([$part], 'assistant part type')[0],
                 };
             }
 
