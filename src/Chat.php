@@ -16,7 +16,6 @@ use Symfony\AI\Platform\Message\AssistantMessage;
 use Symfony\AI\Platform\Message\Message;
 use Symfony\AI\Platform\Message\MessageBag;
 use Symfony\AI\Platform\Message\UserMessage;
-use Symfony\AI\Platform\Result\Stream\Delta\TextDelta;
 
 /**
  * @author Christopher Hertel <mail@christopher-hertel.de>
@@ -60,17 +59,9 @@ final class Chat implements ChatInterface
 
         $execution = $this->agent->call($messages, ['stream' => true]);
 
-        // the execution's deltas are the streamed answer; accumulate the text to persist it afterwards
-        $content = '';
-        foreach ($execution->asStream() as $delta) {
-            if ($delta instanceof TextDelta) {
-                $content .= $delta;
-            }
+        yield from $execution->asStream();
 
-            yield $delta;
-        }
-
-        $assistantMessage = Message::ofAssistant($content);
+        $assistantMessage = Message::ofAssistant($execution->getResult());
         $assistantMessage->getMetadata()->merge($execution->getMetadata());
         $messages->add($assistantMessage);
 
